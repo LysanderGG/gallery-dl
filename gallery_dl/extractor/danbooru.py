@@ -28,6 +28,16 @@ class DanbooruTagExtractor(DanbooruExtractor, booru.BooruTagExtractor):
     })]
 
 
+class DanbooruTagExtractor2(DanbooruExtractor, booru.BooruTagExtractor2):
+    """Extractor for images from danbooru based on search-tags - after first 1000 pages"""
+    subcategory = "tag2"
+    pattern = [(r"(?:https?://)?(?:www\.)?danbooru.donmai.us/posts\?page=([a-zA-Z0-9]+)&tags=([^&]+)")]
+    test = [("https://danbooru.donmai.us/posts?page=a2653831&tags=rating%3Asafe", {
+        "url": "f94774bcb5169e943efb4d7bb51c47ae786b05f3", #TODO
+        "content": "b196fb9f1668109d7774a0a82efea3ffdda07746", #TODO
+    })]
+
+
 class DanbooruPoolExtractor(DanbooruExtractor, booru.BooruPoolExtractor):
     """Extractor for image-pools from danbooru"""
     subcategory = "pool"
@@ -46,3 +56,4 @@ class DanbooruPostExtractor(DanbooruExtractor, booru.BooruPostExtractor):
         "url": "9caa006a4d9eedbacbe030655ade0d3225399749",
         "content": "5e255713cbf0a8e0801dc423563c34d896bb9229",
     })]
+

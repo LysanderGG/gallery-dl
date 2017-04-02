@@ -13,6 +13,7 @@ from .. import text
 import xml.etree.ElementTree as ET
 import json
 import urllib.parse
+import re
 
 
 class BooruExtractor(Extractor):
@@ -122,6 +123,35 @@ class BooruTagExtractor(BooruExtractor):
 
     def get_job_metadata(self):
         return {"tags": self.tags}
+
+class BooruTagExtractor2(BooruExtractor):
+    """Extractor for images based on search-tags"""
+    directory_fmt = ["{category}", "{tags}"]
+    filename_fmt = "{category}_{id}_{md5}.{extension}"
+    url = ""
+
+    def __init__(self, match):
+        BooruExtractor.__init__(self)
+        self.tags = text.unquote(match.group(2))
+        self.params["tags"] = self.tags
+        self.pagestart = text.unquote(match.group(1))
+        self.url = match.string
+
+    def get_job_metadata(self):
+        return {"tags": self.tags}
+
+    def update_page(self, reset=False):
+        """Update the value of the 'page' parameter"""
+        if reset is False:
+            page = self.request(self.url).text
+            next_page_url, _ = text.extract(page, '<a rel="next" href="', '">Next &gt;</a>')
+            match = re.compile(r"/posts\?page=([a-zA-Z0-9]+)&amp;tags=([^&]+)").match(next_page_url)
+            next_page = text.unquote(match.group(1))
+
+            self.url = self.url.split("/posts")[0] + match.string
+            self.params[self.pagekey] = next_page
+        else:
+            self.params[self.pagekey] = self.pagestart
 
 
 class BooruPoolExtractor(BooruExtractor):
